@@ -207,19 +207,16 @@ public class Run extends ListActivity {
 //  Log.v(Run.LOGTAG, " " + Run.CLASSTAG + " Line Buffer  " + ExecutingLineBuffer);
 
 	public static class Command {						// Map a command key word string to its execution function
-		private final String mName;						// The command key word
-		public Command(String name) { mName = name; }
-		public String name() { return mName; }			// Get the command key word
+		public final String name;						// The command key word
+		public Command(String name) { this.name = name; }
 		public boolean run() { return false; }			// Run the command execution function
 	}
 
 	private boolean executeCommand(Command[] commands, String type){// If the current line starts with a key word in a command list
 																	// execute the command. The "type" is used only to report errors.
-		String line = ExecutingLineBuffer.substring(LineIndex, ExecutingLineBuffer.length());
 		for (Command c : commands) {								// loop through the command list
-			String name = c.name();
-			if (line.startsWith(name)) {							// if there is a match
-				LineIndex += name.length();							// move the line index to end of key word
+			if (ExecutingLineBuffer.startsWith(c.name, LineIndex)) {// if there is a match
+				LineIndex += c.name.length();						// move the line index to end of key word
 				return c.run();										// run the function and report back
 			}
 		}
@@ -464,53 +461,55 @@ public class Run extends ListActivity {
     	"sinh(", "pow(", "log10(",
     	"ucode("
     };
-    
-    public static final int MFsin = 0;			// Enumerated name for the Match Functions
-    public static final int MFcos = 1;
-    public static final int MFtan = 2;
-    public static final int MFsqr = 3;
-    public static final int MFabs = 4;
-    public static final int MFrnd = 5;
-    public static final int MFval = 6;
-    public static final int MFlen = 7;
-    public static final int MFacos = 8;
-    public static final int MFasin = 9;
-    public static final int MFatan2 = 10;
-    public static final int MFceil = 11;
-    public static final int MFfloor = 12;
-    public static final int MFmod = 13;
-    public static final int MFlog = 14;
-    public static final int MFround = 15;
-    public static final int MFtoradians = 16;
-    public static final int MFtodegrees = 17;
-    public static final int MFtime = 18;
-    public static final int MFexp = 19;
-    public static final int MFis_in = 20;
-    public static final int MFclock = 21;
-    public static final int MFbor = 22;
-    public static final int MFband = 23;
-    public static final int MFbxor = 24;
-    public static final int MFcollision = 25;
-    public static final int MFascii = 26;
-    public static final int MFstarts_with = 27;
-    public static final int MFends_with = 28;
-    public static final int MFhex = 29;
-    public static final int MFoct = 30;
-    public static final int MFbin = 31;
-    public static final int MFshift = 32;
-    public static final int MFrandomize = 33;
-    public static final int MFbackground = 34;
-    public static final int MFatan = 35;
-    public static final int MFcbrt = 36;
-    public static final int MFcosh = 37;
-    public static final int MFhypot = 38;
-    public static final int MFsinh = 39;
-    public static final int MFpow = 40;
-    public static final int MFlog10 = 41;
-    public static final int MFucode = 42;
 
-    public static  int MFNumber = 0;				// Will contain a math function's enumerated name value
-    
+	private final Command[] MF_cmd = new Command[] {	// Map Math Function key words to their execution functions
+		new Command("sin(")             { public boolean run() { return MFsin(); } },
+		new Command("cos(")             { public boolean run() { return MFcos(); } },
+		new Command("tan(")             { public boolean run() { return MFtan(); } },
+		new Command("sqr(")             { public boolean run() { return MFsqr(); } },
+		new Command("abs(")             { public boolean run() { return MFabs(); } },
+		new Command("rnd(")             { public boolean run() { return MFrnd(); } },
+		new Command("val(")             { public boolean run() { return MFval(); } },
+		new Command("len(")             { public boolean run() { return MFlen(); } },
+		new Command("acos(")            { public boolean run() { return MFacos(); } },
+		new Command("asin(")            { public boolean run() { return MFasin(); } },
+		new Command("atan2(")           { public boolean run() { return MFatan2(); } },
+		new Command("ceil(")            { public boolean run() { return MFceil(); } },
+		new Command("floor(")           { public boolean run() { return MFfloor(); } },
+		new Command("mod(")             { public boolean run() { return MFmod(); } },
+		new Command("log(")             { public boolean run() { return MFlog(); } },
+		new Command("round(")           { public boolean run() { return MFround(); } },
+		new Command("toradians(")       { public boolean run() { return MFtoradians(); } },
+		new Command("todegrees(")       { public boolean run() { return MFtodegrees(); } },
+		new Command("time(")            { public boolean run() { return MFtime(); } },
+		new Command("exp(")             { public boolean run() { return MFexp(); } },
+		new Command("is_in(")           { public boolean run() { return MFis_in(); } },
+		new Command("clock(")           { public boolean run() { return MFclock(); } },
+		new Command("bor(")             { public boolean run() { return MFbor(); } },
+		new Command("band(")            { public boolean run() { return MFband(); } },
+		new Command("bxor(")            { public boolean run() { return MFbxor(); } },
+		new Command("gr_collision(")    { public boolean run() { return MFcollision(); } },
+		new Command("ascii(")           { public boolean run() { return MFascii(); } },
+		new Command("starts_with(")     { public boolean run() { return MFstarts_with(); } },
+		new Command("ends_with(")       { public boolean run() { return MFends_with(); } },
+		new Command("hex(")             { public boolean run() { return MFhex(); } },
+		new Command("oct(")             { public boolean run() { return MFoct(); } },
+		new Command("bin(")             { public boolean run() { return MFbin(); } },
+		new Command("shift(")           { public boolean run() { return MFshift(); } },
+		new Command("randomize(")       { public boolean run() { return MFrandomize(); } },
+		new Command("background(")      { public boolean run() { return MFbackground(); } },
+		new Command("atan(")            { public boolean run() { return MFatan(); } },
+		new Command("cbrt(")            { public boolean run() { return MFcbrt(); } },
+		new Command("cosh(")            { public boolean run() { return MFcosh(); } },
+		new Command("hypot(")           { public boolean run() { return MFhypot(); } },
+		new Command("sinh(")            { public boolean run() { return MFsinh(); } },
+		new Command("pow(")             { public boolean run() { return MFpow(); } },
+		new Command("log10(")           { public boolean run() { return MFlog10(); } },
+		new Command("ucode(")           { public boolean run() { return MFucode(); } }
+	};
+
+	private Dictionary MF_Dictionary = null;
+
     //*********************** The variables for the Operators  ************************
  
     public static final String OperatorString[]={
@@ -547,41 +546,6 @@ public class Run extends ListActivity {
     public static final int SOE = 19;
     public static final int EOL = 20;
     public static final int FLPRN = 21;
-/*
- * The values of the constants that follow must be in the same sequence as
- * the math functions.     
- */
-    public static final int FSIN = 22;
-    public static final int FCOS = 23;
-    public static final int FTAN = 24;
-    public static final int FSQR = 25;
-    public static final int FABS = 26;
-    public static final int FRND = 27;
-
-    public static final int FVAL = 28;
-    public static final int FLEN = 29;
-    
-	public static final int FACOS = 30;
-    public static final int FASIN = 31;
-    public static final int FATAN  = 32;
-    public static final int FCEIL = 33;
-    
-    public static final int FFLOOR = 34;
-    public static final int FMOD = 35;
-    public static final int FLOG = 36;
-    public static final int FROUND = 37;
-    
-    public static final int FTORADIANS = 38;
-    public static final int FTODEGREES = 39;
-    public static final int FENULL1 = 40;
-    public static final int FEXP = 41;
-    public static final int FISIN = 42;
-    public static final int FCLOCK = 43;
-    public static final int FBOR = 44;
-    public static final int FBAND = 45;
-    public static final int FBXOR = 46;
-    
-    public static final int FakeEOL = 47;
    	
     public static final int GoesOnPrecedence[]={     // Precedence for going onto stack
         8,  8,  8, 8, 8,
@@ -3540,20 +3504,44 @@ private  boolean StatementExecuter(){					// Execute one basic line (statement)
 		return true;															// Say we have a string constant
 	}
 		
-	private  boolean MathFunction(){					// get a Math Function if there is one
+	private Command MathFunction(){					// get a Math Function if there is one
 													// Test for Math Function
-													// chop off used part of the line
-		
-		int i = 0;
-		for (i = 0; i<MathFunctions.length; ++i){                   // Does the chopped line
-			 if (ExecutingLineBuffer.startsWith(MathFunctions[i],LineIndex)){				// start with a math function?
-				 MFNumber = i;										// if it does, set the Enumerated name
-				 LineIndex = LineIndex + MathFunctions[i].length();	// set line index to end of MF
-				 if (LineIndex >= ExecutingLineBuffer.length()) return false;
-				 return true;										// We have a math function
-			 	}
+		// long t0 = SystemClock.elapsedRealtime();
+		if (MF_Dictionary == null) {
+			MF_Dictionary = new Dictionary();
+			for (Command c : MF_cmd) {
+				MF_Dictionary.addWord(c.name, c);
 			}
-		return false;												// Not a math function
+		}
+		// long t1 = SystemClock.elapsedRealtime();
+		int max = MF_Dictionary.getMaxLength();
+		max = Math.min(max, ExecutingLineBuffer.length() - LineIndex);
+		String search = ExecutingLineBuffer.substring(LineIndex, LineIndex + max);
+		// long t2 = SystemClock.elapsedRealtime();
+		Command c;
+		// int i;
+		// for (i = 0; i < 1000; i++) 
+		c = (Command)MF_Dictionary.findWord(search, max);
+		// long t3 = SystemClock.elapsedRealtime();
+		// for (i = 0; i < 1000; i++) {
+		// 	for (int j = 0; j < MathFunctions.length; ++j) {
+		// 		boolean b = ExecutingLineBuffer.startsWith(MathFunctions[j], LineIndex);
+		// 	}
+		// }
+		// long t4 = SystemClock.elapsedRealtime();
+		// PrintShow("Build dictionary:  " + (t1 - t0) + " ms");
+		// PrintShow("Prep:              " + (t2 - t1) + " ms");
+		// PrintShow("Search dictionary: " + (t3 - t2) + " ns");
+		// PrintShow("Use startsWith:    " + (t4 - t3) + " ns");
+		return c;
+//		for (Command c : MF_cmd) {  								// loop through the command list
+//			if (ExecutingLineBuffer.startsWith(c.name, LineIndex)) {// if there is a match
+//				LineIndex += c.name.length();						// move the line index to end of key word
+//				if (LineIndex >= ExecutingLineBuffer.length()) { break; } // eol: return null
+//				return c;   										// we have a math function
+//			}
+//		}
+//		return null;												// no key word found
 	}
 	
 	private  boolean executeLET(){						// Execute a real or pseudo LET
@@ -3612,6 +3600,7 @@ private  boolean StatementExecuter(){					// Execute one basic line (statement)
 
 																// The recursive part of Eval Expression
 		Bundle ufb = ufBundle;
+		Command cmd;
 			
 		char c = ExecutingLineBuffer.charAt(LineIndex);         // First character
  
@@ -3636,13 +3625,17 @@ private  boolean StatementExecuter(){					// Execute one basic line (statement)
 			theValueStack.push(NumericVarValues.get(theValueIndex));	// Push value of Var
 		}
 
-		else if (MathFunction()){						// Try Match Function
-			if (!doMathFunction(theOpStack, theValueStack )) return false;
+		else if ((cmd = MathFunction()) != null) {		// Try Math Function
+			LineIndex += cmd.name.length();						// move the line index to end of key word
+			if (LineIndex >= ExecutingLineBuffer.length()) return false;
+			if (!cmd.run()) return false;
+			if (!isNext(')')) return false;				// Every function must have a closing right parenthesis.
+			theValueStack.push(EvalNumericExpressionValue);
 		}
 		
 		else if (evalStringExpression()){		           // Try String Logical Expression
 			if (!SEisLE)return false;                      // If was not a logical string expression, fail
-			theValueStack.push(EvalNumericExpressionValue);			
+			theValueStack.push(EvalNumericExpressionValue);
 		}
 
 		else if (isUserFunction(true)){						// Try User Function
@@ -3929,442 +3922,426 @@ private  boolean StatementExecuter(){					// Execute one basic line (statement)
 		theOpStack.push(op);          // Push the current operator
 		return true;
 	}
-		
-		private boolean doMathFunction(Stack<Integer> theOpStack, Stack<Double> theValueStack){
-			double d1 = 0.0;
-			double d2 = 0.0;
-			
-			switch (MFNumber){
-			
-			case MFsin:
-				if (!evalNumericExpression()) return false;
-				d1 = EvalNumericExpressionValue;
-				theValueStack.push(Math.sin(d1));
-				break;
 
-			case MFcos:
-				if (!evalNumericExpression()) return false;
-				d1 = EvalNumericExpressionValue;
-				theValueStack.push(Math.cos(d1));
-				break;
+	/***************** Math functions ************/
 
-			case MFtan:
-				if (!evalNumericExpression()) return false;
-				d1 = EvalNumericExpressionValue;
-				theValueStack.push(Math.tan(d1));
-				break;
+	private boolean MFsin() {
+		if (!evalNumericExpression()) return false;
+		EvalNumericExpressionValue = Math.sin(EvalNumericExpressionValue);
+		return true;
+	}
 
-			case MFsqr:
-				if (!evalNumericExpression()) return false;
-				d1 = EvalNumericExpressionValue;
-				theValueStack.push(Math.sqrt(d1));
-				break;
-				
-			case MFabs:
-				if (!evalNumericExpression()) return false;
-				d1 = EvalNumericExpressionValue;
-				theValueStack.push(Math.abs(d1));
-				break;
+	private boolean MFcos() {
+		if (!evalNumericExpression()) return false;
+		EvalNumericExpressionValue = Math.cos(EvalNumericExpressionValue);
+		return true;
+	}
 
-			case MFceil:
-				if (!evalNumericExpression()) return false;
-				d1 = EvalNumericExpressionValue;
-				theValueStack.push(Math.ceil(d1));
-				break;
-				
-			case MFfloor:
-				if (!evalNumericExpression()) return false;
-				d1 = EvalNumericExpressionValue;
-				theValueStack.push(Math.floor(d1));
-				break;
-				
-			case MFlog:
-				if (!evalNumericExpression()) return false;
-				d1 = EvalNumericExpressionValue;
-				theValueStack.push(Math.log(d1));
-				break;
+	private boolean MFtan() {
+		if (!evalNumericExpression()) return false;
+		EvalNumericExpressionValue = Math.tan(EvalNumericExpressionValue);
+		return true;
+	}
 
-			case MFexp:
-				if (!evalNumericExpression()) return false;
-				d1 = EvalNumericExpressionValue;
-				theValueStack.push(Math.exp(d1));
-				break;
-			
-			case MFtodegrees:
-				if (!evalNumericExpression()) return false;
-				d1 = EvalNumericExpressionValue;
-				theValueStack.push(Math.toDegrees(d1));
-				break;
+	private boolean MFcosh() {
+		if (!evalNumericExpression()) return false;
+		EvalNumericExpressionValue = Math.cosh(EvalNumericExpressionValue);
+		return true;
+	}
 
-			case MFtoradians:
-				if (!evalNumericExpression()) return false;
-				d1 = EvalNumericExpressionValue;
-				theValueStack.push(Math.toRadians(d1));
-				break;
+	private boolean MFsinh() {
+		if (!evalNumericExpression()) return false;
+		EvalNumericExpressionValue = Math.sinh(EvalNumericExpressionValue);
+		return true;
+	}
 
-			case MFatan:
-				if (!evalNumericExpression()) return false;
-				d1 = EvalNumericExpressionValue;
-				theValueStack.push(Math.atan(d1));
-				break;
+	private boolean MFsqr() {
+		if (!evalNumericExpression()) return false;
+		EvalNumericExpressionValue = Math.sqrt(EvalNumericExpressionValue);
+		return true;
+	}
 
-			case MFacos:
-				if (!evalNumericExpression()) return false;
-				d1 = EvalNumericExpressionValue;
-				if (d1<-1 || d1> 1){
-					RunTimeError("ACOS parameter out of range");
-					return false;
-				}
-				theValueStack.push(Math.acos(d1));
-				break;
+	private boolean MFcbrt() {
+		if (!evalNumericExpression()) return false;
+		EvalNumericExpressionValue = Math.cbrt(EvalNumericExpressionValue);
+		return true;
+	}
 
-			case MFasin:
-				if (!evalNumericExpression()) return false;
-				d1 = EvalNumericExpressionValue;
-				if (d1<-1 || d1> 1){
-					RunTimeError("ASIN parameter out of range");
-					return false;
-				}
-				theValueStack.push(Math.asin(d1));
-				break;
+	private boolean MFabs() {
+		if (!evalNumericExpression()) return false;
+		EvalNumericExpressionValue = Math.abs(EvalNumericExpressionValue);
+		return true;
+	}
 
-			case MFround:
-				if (!evalNumericExpression()) return false;
-				d1 = EvalNumericExpressionValue;
-				theValueStack.push((double) Math.round(d1));
-				break;
+	private boolean MFceil() {
+		if (!evalNumericExpression()) return false;
+		EvalNumericExpressionValue = Math.ceil(EvalNumericExpressionValue);
+		return true;
+	}
 
-			case MFlen:								// LEN(s$
-				if (!getStringArg()) { return false; }			// Get and check the string expression
-				 d1= (double) StringConstant.length();			// then get it's length
-				 theValueStack.push(d1);						// and push onto value stack
-				 break;
-			
-			case MFrandomize:
-				if (!evalNumericExpression()) return false;
-			    d1 = EvalNumericExpressionValue;
-				if ( d1 == 0 )randomizer = new Random();
-				else randomizer = new Random((long) d1);
-				theValueStack.push(0.0);
-				break;
-			
-			
-			case MFrnd:
-				if (randomizer == null) randomizer = new Random();
-				theValueStack.push( randomizer.nextDouble());
-				break;
-			
-			case MFbackground:
-				if (background) theValueStack.push( 1.0);
-				else theValueStack.push( 0.0 );
-				break;
+	private boolean MFfloor() {
+		if (!evalNumericExpression()) return false;
+		EvalNumericExpressionValue = Math.floor(EvalNumericExpressionValue);
+		return true;
+	}
 
+	private boolean MFround() {
+		if (!evalNumericExpression()) return false;
+		EvalNumericExpressionValue = (double)Math.round(EvalNumericExpressionValue);
+		return true;
+	}
 
-			case MFval:								// VAL(s$
-				if (!getStringArg()) { return false; }			// Get and check the string expression
-				StringConstant = StringConstant.trim();
-				if (StringConstant.length()== 0 ) {
-					RunTimeError("VAL of empty string is not valid");
-					return false;
-				}
-			
-				try { d1 = Double.parseDouble(StringConstant);}			// have java parse it into a double
-				catch (Exception e) {
-					return RunTimeError(e);
-				}
-				theValueStack.push(d1);							// Push number onto value stack
-				break;
-			
-			case MFascii:
-				if (!getStringArg()) { return false; }			// Get and check the string expression
-				if (StringConstant.equals("")) d1 =256;
-				else d1 = (double)(StringConstant.charAt(0) & 0x00FF);
-				theValueStack.push(d1);							// Push number onto value stack
-				break;
+	private boolean MFlog() {
+		if (!evalNumericExpression()) return false;
+		EvalNumericExpressionValue = Math.log(EvalNumericExpressionValue);
+		return true;
+	}
 
-			case MFucode:
-				if (!getStringArg()) { return false; }			// Get and check the string expression
-				if (StringConstant.equals("")) d1 = 0x10000;
-				else d1 = (double)(StringConstant.charAt(0));
-				theValueStack.push(d1);							// Push number onto value stack
-				break;
-			
-			case MFmod:									// MOD( d1,d2
-				if (!evalNumericExpression()){return false;}				// Get d1
-				d1 = EvalNumericExpressionValue;
-				if (!isNext(',')) { return false; }
-				if (!evalNumericExpression()){return false;}				// Get d2
-				d2 = EvalNumericExpressionValue;
-				
-				if (d2==0){
-					RunTimeError("DIVIDE BY ZERO AT:");
-					return false;
-				}
-				theValueStack.push(d1 % d2);
-				break;
-			
-			case MFbor:
-				if (!evalNumericExpression()){return false;}				// Get d1
-				d1 = EvalNumericExpressionValue;
-				if (!isNext(',')) { return false; }
-				if (!evalNumericExpression()){return false;}				// Get d2
-				d2 = EvalNumericExpressionValue;
-				theValueStack.push((double)((long)d1 | (long)d2));
-				break;
-			
-			
-			case MFband:
-				if (!evalNumericExpression()){return false;}				// Get d1
-				d1 = EvalNumericExpressionValue;
-				if (!isNext(',')) { return false; }
-				if (!evalNumericExpression()){return false;}				// Get d2
-				d2 = EvalNumericExpressionValue;
-				theValueStack.push((double)((long)d1 & (long)d2));
-				break;
-			
-			
-			case MFbxor:
-				if (!evalNumericExpression()){return false;}				// Get d1
-				d1 = EvalNumericExpressionValue;
-				if (!isNext(',')) { return false; }
-				if (!evalNumericExpression()){return false;}				// Get d2
-				d2 = EvalNumericExpressionValue;
-				theValueStack.push((double)((long)d1 ^ (long)d2));
-				break;
-			
+	private boolean MFlog10() {
+		if (!evalNumericExpression()) return false;
+		EvalNumericExpressionValue = Math.log10(EvalNumericExpressionValue);
+		return true;
+	}
 
-				
-			case MFis_in:
-				if (!getStringArg()) { return false; }			// Get and check the string expression
-	        	String Search_for = StringConstant;               
-				if (!isNext(',')) { return false; }
-				if (!getStringArg()) { return false; }			// Get and check the string expression
-	        	String Search_in = StringConstant;
-	        	
-	        	int start = 1;
-				if (isNext(',')) {
-					if (!evalNumericExpression()) return false;
-					start = EvalNumericExpressionValue.intValue();
-					if (start < 1 ){
-						RunTimeError("Start value must be >= 1");
-						return false;
-					}
-	        	}
-	        	start = start - 1;									// Make start index zero-based
+	private boolean MFexp() {
+		if (!evalNumericExpression()) return false;
+		EvalNumericExpressionValue = Math.exp(EvalNumericExpressionValue);
+		return true;
+	}
 
-	        	if (start < Search_in.length()) {					// If starting inside the string
-					int k = Search_in.indexOf(Search_for, start);	// Do the search
-					d1 = (double) k+1 ;								// Make results one based
-				} else {
-					d1 = 0.0;										// else "not found"
-				}
-	        	theValueStack.push(d1);                     		// Push result onto stack
-				break;
-			
-			case MFstarts_with:
-				if (!getStringArg()) { return false; }			// Get and check the string expression
-	        	Search_for = StringConstant;               
-				if (!isNext(',')) { return false; }
-				if (!getStringArg()) { return false; }			// Get and check the string expression
-	        	Search_in = StringConstant;
-	        	
-	        	start = 1;
-				if (isNext(',')) {
-					if (!evalNumericExpression()) return false;
-					d1 = EvalNumericExpressionValue;
-					start = (int) d1;
-					if (start < 1 ){
-						RunTimeError("Start value must be >= 1");
-						return false;
-					}
-	        	}
-	        	if (start > Search_in.length()) start = Search_in.length();
-	        	start = start - 1;
+	private boolean MFpow() {
+		if (!evalNumericExpression()) { return false; }			// Get the base
+		double base = EvalNumericExpressionValue;
+		if (!isNext(',')) { return false; }
+		if (!evalNumericExpression()) { return false; }			// Get the exponent
+		double exp = EvalNumericExpressionValue;
+		EvalNumericExpressionValue = Math.pow(base, exp);
+		return true;
+	}
 
-	        	d1 = 0;
-	        	if (Search_in.startsWith(Search_for, start)){
-	        		d1 = Search_for.length();
-	        	}
+	private boolean MFtodegrees() {
+		if (!evalNumericExpression()) return false;
+		EvalNumericExpressionValue = Math.toDegrees(EvalNumericExpressionValue);
+		return true;
+	}
 
-	        	theValueStack.push(d1);                     		// Push result onto stack
-				break;
+	private boolean MFtoradians() {
+		if (!evalNumericExpression()) return false;
+		EvalNumericExpressionValue = Math.toRadians(EvalNumericExpressionValue);
+		return true;
+	}
 
-			case MFends_with:
-				if (!getStringArg()) { return false; }			// Get and check the string expression
-	        	Search_for = StringConstant;               
-				if (!isNext(',')) { return false; }
-				if (!getStringArg()) { return false; }			// Get and check the string expression
-	        	Search_in = StringConstant;
-	        	
-	        	start = 1;
-				if (isNext(',')) {
-					if (!evalNumericExpression()) return false;
-					d1 = EvalNumericExpressionValue;
-					start = (int) d1;
-					if (start < 1 ){
-						RunTimeError("Start value must be >= 1");
-						return false;
-					}
-	        	}
-	        	if (start > Search_in.length()) start = Search_in.length();
-	        	start = start - 1;
+	private boolean MFatan() {
+		if (!evalNumericExpression()) return false;
+		EvalNumericExpressionValue = Math.atan(EvalNumericExpressionValue);
+		return true;
+	}
 
-	        	d1 = 0;
-	        	if (Search_in.endsWith(Search_for)){
-	        		d1 = Search_in.length()-Search_for.length()+1;
-	        	}
+	private boolean MFatan2() {
+		if (!evalNumericExpression()) { return false; }			// Get the y-coordinate
+		double y = EvalNumericExpressionValue;
+		if (!isNext(',')) { return false; }
+		if (!evalNumericExpression()) { return false; }			// Get the x-coordinate
+		double x = EvalNumericExpressionValue;
+		EvalNumericExpressionValue = Math.atan2(y, x);
+		return true;
+	}
 
-	        	theValueStack.push(d1);                     		// Push result onto stack
-				break;
-			
-			case MFclock:
-				theValueStack.push((double) SystemClock.elapsedRealtime());
-				break;
-			
-			case MFtime:
-				if (ExecutingLineBuffer.charAt(LineIndex)== ')') {	// If no args, use current time
-					theValueStack.push((double) System.currentTimeMillis());
-				} else {											// Otherwise, get user-supplied time
-					Time time = theTimeZone.equals("") ? new Time() : new Time(theTimeZone);
-					if (!parseTimeArgs(time)) { return false; }
-					theValueStack.push((double) time.toMillis(true));
-				}
-				break;
-			
-			case MFcollision:
-				if (!evalNumericExpression()){return false;}	// Get the first object number
-	        	int Object1 = EvalNumericExpressionValue.intValue();
-				if (!isNext(',')) { return false; }
-				if (!evalNumericExpression()){return false;}	// Get the second object number
-	        	int Object2 = EvalNumericExpressionValue.intValue();
-
-				double ff = gr_collide(Object1, Object2);
-				if (ff == -1) return false;							// -1 is run time error
-				theValueStack.push(ff);								// else f = 0 (false) or 1 (true)
-				break;
-			
-			
-			case MFhex:
-				if (!getStringArg()) { return false; }			// Get and check the string expression
-	        	long  value = 0;
-	        	try {
-	        		value = Integer.parseInt(StringConstant, 16);
-	        	} catch (Exception e) {
-	        		RunTimeError("Error" + e);
-	        		return false;
-	        	}
-				value = value & 0xffffffff; 
-
-	        	theValueStack.push((double) value);
-				break;
-			
-			
-			case MFoct:
-				if (!getStringArg()) { return false; }			// Get and check the string expression
-	        	value = 0;
-	        	try {
-	        		value = Integer.parseInt(StringConstant, 8);
-	        	} catch (Exception e) {
-	        		RunTimeError("Error" + e);
-	        		return false;
-	        	}
-				value = value & 0xffffffff; 
-
-	        	theValueStack.push((double) value);
-				break;
-			
-			case MFbin:
-				if (!getStringArg()) { return false; }			// Get and check the string expression
-	        	value = 0;
-	        	try {
-	        		value = Integer.parseInt(StringConstant, 2);
-	        	} catch (Exception e) {
-	        		RunTimeError("Error" + e);
-	        		return false;
-	        	}
-				value = value & 0xffffffff; 
-	        	theValueStack.push((double) value);
-				break;
-			
-			
-			case MFshift:
-				if (!evalNumericExpression()){return false;}	// Get the value to shift
-	        	int xvalue = EvalNumericExpressionValue.intValue();
-				if (!isNext(',')) { return false; }
-				if (!evalNumericExpression()){return false;}	// Get the shift amount and direction
-	        	int bits = EvalNumericExpressionValue.intValue();
-
-				int result = 0;
-				if (bits < 0){
-					result = xvalue << -1*bits;
-				}else{
-					result = xvalue >> bits;
-				}
-				
-				theValueStack.push((double) result);
-				break;
-				
-			case MFatan2:
-				if (!evalNumericExpression()) return false;		// Get the x-coordinate
-				d1 = EvalNumericExpressionValue;
-				if (!isNext(',')) { return false; }
-				if (!evalNumericExpression()){return false;}	// Get the y-coordinate
-	        	d2 = EvalNumericExpressionValue;
-				theValueStack.push(Math.atan2(d1, d2));
-				break;
-
-			case MFcbrt:
-				if (!evalNumericExpression()) return false;
-				d1 = EvalNumericExpressionValue;
-				theValueStack.push(Math.cbrt(d1));
-				break;
-
-			case MFcosh:
-				if (!evalNumericExpression()) return false;
-				d1 = EvalNumericExpressionValue;
-				theValueStack.push(Math.cosh(d1));
-				break;
-
-			case MFhypot:
-				if (!evalNumericExpression()) return false;		// Get x
-				d1 = EvalNumericExpressionValue;
-				if (!isNext(',')) { return false; }
-				if (!evalNumericExpression()){return false;}	// Get y
-	        	d2 = EvalNumericExpressionValue;
-				theValueStack.push(Math.hypot(d1, d2));
-				break;
-
-			case MFsinh:
-				if (!evalNumericExpression()) return false;
-				d1 = EvalNumericExpressionValue;
-				theValueStack.push(Math.sinh(d1));
-				break;
-
-			case MFpow:
-				if (!evalNumericExpression()) return false;		// Get the base
-				d1 = EvalNumericExpressionValue;
-				if (!isNext(',')) { return false; }
-				if (!evalNumericExpression()){return false;}	// Get the exponent
-	        	d2 = EvalNumericExpressionValue;
-				theValueStack.push(Math.pow(d1, d2));
-				break;
-
-			case MFlog10:
-				if (!evalNumericExpression()) return false;
-				d1 = EvalNumericExpressionValue;
-				theValueStack.push(Math.log10(d1));
-				break;
-				
-			default:
-				
-			}
-			// Every function must have a closing right parenthesis.
-			return (isNext(')'));
+	private boolean MFacos() {
+		if (!evalNumericExpression()) return false;
+		double d = EvalNumericExpressionValue;
+		if (d < -1 || d > 1) {
+			return RunTimeError("ACOS parameter out of range");
 		}
-															
+		EvalNumericExpressionValue = Math.acos(d);
+		return true;
+	}
 
+	private boolean MFasin() {
+		if (!evalNumericExpression()) return false;
+		double d = EvalNumericExpressionValue;
+		if (d < -1 || d > 1) {
+			return RunTimeError("ASIN parameter out of range");
+		}
+		EvalNumericExpressionValue = Math.asin(d);
+		return true;
+	}
 
-		
+	private boolean MFhypot() {
+		if (!evalNumericExpression()) { return false; }			// Get x
+		double x = EvalNumericExpressionValue;
+		if (!isNext(',')) { return false; }
+		if (!evalNumericExpression()) { return false; }			// Get y
+		double y = EvalNumericExpressionValue;
+		EvalNumericExpressionValue = Math.hypot(x, y);
+		return true;
+	}
+
+	private boolean MFrandomize() {
+		if (!evalNumericExpression()) return false;
+		long value = EvalNumericExpressionValue.longValue();
+		randomizer = (value == 0) ? new Random() : new Random(value);
+		EvalNumericExpressionValue = 0.0;
+		return true;
+	}
+
+	private boolean MFrnd() {
+		if (randomizer == null) randomizer = new Random();
+		EvalNumericExpressionValue = randomizer.nextDouble();
+		return true;
+	}
+
+	private boolean MFmod() {									// MOD(d1,d2)
+		if (!evalNumericExpression()) { return false; }			// Get d1
+		double d1 = EvalNumericExpressionValue;
+		if (!isNext(',')) { return false; }
+		if (!evalNumericExpression()) { return false; }			// Get d2
+		double d2 = EvalNumericExpressionValue;
+		if (d2 == 0) {
+			return RunTimeError("DIVIDE BY ZERO AT:");
+		}
+		EvalNumericExpressionValue = d1 % d2;
+		return true;
+	}
+
+	private boolean MFbor() {
+		if (!evalNumericExpression()) { return false; }			// Get v1
+		long v1 = EvalNumericExpressionValue.longValue();
+		if (!isNext(',')) { return false; }
+		if (!evalNumericExpression()) { return false; }			// Get v2
+		long v2 = EvalNumericExpressionValue.longValue();
+		EvalNumericExpressionValue = (double)(v1 | v2);
+		return true;
+	}
+
+	private boolean MFband() {
+		if (!evalNumericExpression()) { return false; }			// Get v1
+		long v1 = EvalNumericExpressionValue.longValue();
+		if (!isNext(',')) { return false; }
+		if (!evalNumericExpression()) { return false; }			// Get v2
+		long v2 = EvalNumericExpressionValue.longValue();
+		EvalNumericExpressionValue = (double)(v1 & v2);
+		return true;
+	}
+
+	private boolean MFbxor() {
+		if (!evalNumericExpression()) { return false; }			// Get v1
+		long v1 = EvalNumericExpressionValue.longValue();
+		if (!isNext(',')) { return false; }
+		if (!evalNumericExpression()) { return false; }			// Get v2
+		long v2 = EvalNumericExpressionValue.longValue();
+		EvalNumericExpressionValue = (double)(v1 ^ v2);
+		return true;
+	}
+
+	private boolean MFshift() {
+		if (!evalNumericExpression()){return false;}			// Get the value to shift
+		int value = EvalNumericExpressionValue.intValue();
+		if (!isNext(',')) { return false; }
+		if (!evalNumericExpression()){return false;}			// Get the shift amount and direction
+		int bits = EvalNumericExpressionValue.intValue();
+
+		int result = 0;
+		if (bits < 0) {
+			result = value << -bits;
+		}else{
+			result = value >> bits;
+		}
+		EvalNumericExpressionValue = (double)result;
+		return true;
+	}
+
+	private boolean MFlen() {									// LEN(s$)
+		if (!getStringArg()) { return false; }					// Get and check the string expression
+		EvalNumericExpressionValue = (double)StringConstant.length(); // then get its length
+		return true;
+	}
+
+	private boolean MFbackground() {
+		EvalNumericExpressionValue = background ? 1.0 : 0.0;
+		return true;
+	}
+
+	private boolean MFclock() {
+		EvalNumericExpressionValue = (double)SystemClock.elapsedRealtime();
+		return true;
+	}
+
+	private boolean MFtime() {
+		long t;
+		if (ExecutingLineBuffer.charAt(LineIndex)== ')') {		// If no args, use current time
+			t = System.currentTimeMillis();
+		} else {												// Otherwise, get user-supplied time
+			Time time = theTimeZone.equals("") ? new Time() : new Time(theTimeZone);
+			if (!parseTimeArgs(time)) { return false; }
+			t = time.toMillis(true);
+		}
+		EvalNumericExpressionValue = (double)t;
+		return true;
+	}
+
+	private boolean MFcollision() {
+		if (!evalNumericExpression()) { return false; }			// Get the first object number
+		int Object1 = EvalNumericExpressionValue.intValue();
+		if (!isNext(',')) { return false; }
+		if (!evalNumericExpression()) { return false; }			// Get the second object number
+		int Object2 = EvalNumericExpressionValue.intValue();
+
+		double d = gr_collide(Object1, Object2);
+		if (d == -1) { return false; }							// -1 is run time error
+		EvalNumericExpressionValue = d;
+		return true;
+	}
+
+	private boolean MFval() {									// VAL(s$
+		if (!getStringArg()) { return false; }					// Get and check the string expression
+		StringConstant = StringConstant.trim();
+		if (StringConstant.length() == 0 ) {
+			return RunTimeError("VAL of empty string is not valid");
+		}
+		double d;
+		try { d = Double.parseDouble(StringConstant); }			// have java parse it into a double
+		catch (Exception e) {
+			return RunTimeError(e);
+		}
+		EvalNumericExpressionValue = d;
+		return true;
+	}
+
+	private boolean MFascii() {
+		if (!getStringArg()) { return false; }					// Get and check the string expression
+		double d = StringConstant.equals("")
+				 ? 256 : (StringConstant.charAt(0) & 0x00FF);
+		EvalNumericExpressionValue = d;
+		return true;
+	}
+
+	private boolean MFucode() {
+		if (!getStringArg()) { return false; }					// Get and check the string expression
+		double d = StringConstant.equals("")
+				 ? 0x10000 : StringConstant.charAt(0);
+		EvalNumericExpressionValue = d;
+		return true;
+	}
+
+	private boolean MFhex() {
+		if (!getStringArg()) { return false; }					// Get and check the string expression
+		long value;
+		try {
+			value = Integer.parseInt(StringConstant, 16);
+		} catch (Exception e) {
+			return RunTimeError(e);
+		}
+		EvalNumericExpressionValue = (double)(value & 0xffffffff);
+		return true;
+	}
+
+	private boolean MFoct() {
+		if (!getStringArg()) { return false; }					// Get and check the string expression
+		long value;
+		try {
+			value = Integer.parseInt(StringConstant, 8);
+		} catch (Exception e) {
+			return RunTimeError(e);
+		}
+		EvalNumericExpressionValue = (double)(value & 0xffffffff);
+		return true;
+	}
+
+	private boolean MFbin() {
+		if (!getStringArg()) { return false; }					// Get and check the string expression
+		long value;
+		try {
+			value = Integer.parseInt(StringConstant, 2);
+		} catch (Exception e) {
+			return RunTimeError(e);
+		}
+		EvalNumericExpressionValue = (double)(value & 0xffffffff);
+		return true;
+	}
+
+	private boolean MFis_in() {
+		if (!getStringArg()) { return false; }					// Get and check the "search for" string expression
+		String Search_for = StringConstant;
+		if (!isNext(',')) { return false; }
+		if (!getStringArg()) { return false; }					// Get and check the "search in" string expression
+		String Search_in = StringConstant;
+
+		int start = 1;
+		if (isNext(',')) {
+			if (!evalNumericExpression()) { return false; }
+			start = EvalNumericExpressionValue.intValue();
+			if (start < 1 ) {
+				return RunTimeError("Start value must be >= 1");
+			}
+		}
+		start = start - 1;										// Make start index zero-based
+
+		if (start < Search_in.length()) {						// If starting inside the string
+			int k = Search_in.indexOf(Search_for, start);		// Do the search
+			EvalNumericExpressionValue = (double)k + 1;			// Make results one based
+		} else {
+			EvalNumericExpressionValue = 0.0;					// else "not found"
+		}
+		return true;
+	}
+
+	private boolean MFstarts_with() {
+		if (!getStringArg()) { return false; }					// Get and check the "search for" string expression
+		String Search_for = StringConstant;
+		if (!isNext(',')) { return false; }
+		if (!getStringArg()) { return false; }					// Get and check the "search in" string expression
+		String Search_in = StringConstant;
+
+		int start = 1;
+		if (isNext(',')) {
+			if (!evalNumericExpression()) { return false; }
+			start = EvalNumericExpressionValue.intValue();
+			if (start < 1 ) {
+				return RunTimeError("Start value must be >= 1");
+			}
+		}
+		if (start > Search_in.length()) { start = Search_in.length(); }
+		start = start - 1;										// Make start index zero-based
+
+		int length;
+		if (Search_in.startsWith(Search_for, start)) {
+			length = Search_for.length();
+		} else {
+			length = 0;
+		}
+		EvalNumericExpressionValue = (double)length;
+		return true;
+	}
+
+	private boolean MFends_with() {
+		if (!getStringArg()) { return false; }					// Get and check the "search for" string expression
+		String Search_for = StringConstant;
+		if (!isNext(',')) { return false; }
+		if (!getStringArg()) { return false; }					// Get and check the "search in" string expression
+		String Search_in = StringConstant;
+
+		int start = 1;
+		if (isNext(',')) {
+			if (!evalNumericExpression()) { return false; }
+			start = EvalNumericExpressionValue.intValue();
+			if (start < 1 ) {
+				return RunTimeError("Start value must be >= 1");
+			}
+		}
+		if (start > Search_in.length()) { start = Search_in.length(); }
+		start = start - 1;										// Make start index zero-based
+
+		int length;
+		if (Search_in.endsWith(Search_for)) {
+			length = Search_in.length() - Search_for.length() + 1;
+		} else {
+			length = 0;
+		}
+		EvalNumericExpressionValue = (double)length;
+		return true;
+	}
+
 	private  boolean getStringFunction(){				// Get a string function if there is one
 													// are the next characters a String Function?
 													// start by chopping off the part of the line
@@ -15055,13 +15032,11 @@ private boolean doUserFunction(){
 //    ***********************************  Superuser and System ***************************
 
 	private boolean executeSU(boolean isSU) {	// SU command (isSU true) or system comand (isSU false)
-		String line = ExecutingLineBuffer.substring(LineIndex, ExecutingLineBuffer.length());
 		for (Command c : SU_cmd) {								// loop through the command list
-			String name = c.name();
-			if (line.startsWith(name)) {						// if there is a match
-				LineIndex += name.length();						// move the line index to end of key word
+			if (ExecutingLineBuffer.startsWith(c.name, LineIndex)) {	// if there is a match
+				LineIndex += c.name.length();						// move the line index to end of key word
 				if (SUprocess == null) {
-					if (name.equals("open")) this.isSU = isSU;
+					if (c.name.equals("open")) this.isSU = isSU;
 					else return RunTimeError((isSU ? "Superuser" : "System shell") + " not opened");
 				}
 				return c.run();									// run the function and report back

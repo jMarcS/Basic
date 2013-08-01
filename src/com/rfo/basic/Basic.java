@@ -614,7 +614,180 @@ public class Basic extends ListActivity  {
     	         }
 
     		}
-    
-    
-    
+
+	/******************* Utility classes ************************/
+
+	public static class Dictionary {
+		private static final char NULL = '\0';
+		private final char c;
+		private final ArrayList<Dictionary> list;
+		private Object payload;
+		private int maxLength = 0;
+
+		public Dictionary() {				// constructor for top node only
+			this(NULL, new ArrayList<Dictionary>());
+		}
+
+		public Dictionary(char c) {			// constructor for all other nodes
+			this(c, (c == NULL) ? null : new ArrayList<Dictionary>());
+		}
+
+		private Dictionary(char c, ArrayList<Dictionary> list) {
+			this.c = c;
+			this.list = list;
+		}
+
+		private char getChar() {
+			return c;
+		}
+
+		private ArrayList<Dictionary> getList() {
+			return list;
+		}
+
+		private void setPayload(Object payload) {
+			if (getList() != null) {
+				throw new UnsupportedOperationException("list and payload are mutually exclusive");
+			}
+			this.payload = payload;
+		}
+
+		private Object getPayload() {
+			return payload;
+		}
+
+		public int getMaxLength() {
+			return maxLength;
+		}
+
+		private boolean contains(char c) {
+			for (Dictionary n : list) {
+				if (c == n.getChar()) {
+					return true;
+				}
+			}
+			return false;
+		}
+
+		private Dictionary getNode(char c) {
+			for (Dictionary n : getList()) {
+				if (c == n.getChar()) {
+					return n;
+				}
+			}
+			return null;
+		}
+
+		private Dictionary add(char c) {
+			Dictionary n = getNode(c);
+			if (n == null) {
+				n = new Dictionary(c);
+				getList().add(n);
+			}
+			return n;
+		}
+
+		public void addWord(String s, Object payload) {
+			Dictionary n = this;
+			for (char c : s.toCharArray()) {
+				n = n.add(c);
+			}
+			n = n.add(NULL);
+			n.setPayload(payload);
+			int len = s.length();
+			if (len > maxLength) { maxLength = len; }
+		}
+
+//		public int findWord(String s, int max) {
+//			max = Math.min(max, s.length());
+//			return findWord(this, s, 0, max);
+//		}
+//
+//		private int findWord(Dictionary d, String s, int i, int max) {
+//			if (d == null) { return 0; }
+//			int depth = (i < max) ? findWord(d.getNode(s.charAt(i)), s, i + 1, max) : 0;
+//			return ((depth == 0) && d.contains(NULL)) ? i : depth;
+//		}
+
+//		public Object findWord(String s, int max) {
+//			max = Math.min(max, s.length());
+//			Dictionary d = findWord(this, s, 0, max);
+//			return (d == null) ? null : d.getPayload();
+//		}
+
+		public Object findWord(String s, int max) {
+			max = Math.min(max, s.length());
+			Dictionary d[] = new Dictionary[max + 1];
+			Dictionary dd = null;
+			d[0] = this;
+			int i = 0;
+			while (i < max) {
+				dd = d[i].getNode(s.charAt(i));
+				d[++i] = dd;
+				if (dd == null) { break; }
+			}
+			while (i >= 0) {
+				dd = d[i--];
+				if (dd != null) {
+					dd = dd.getNode(NULL);
+					if (dd != null)  { return dd.getPayload(); }
+				}
+			}
+			return null;
+		}
+
+		private Dictionary findWord(Dictionary d, String s, int i, int max) {
+			if (d == null) { return null; }
+			Dictionary target = (i < max) ? findWord(d.getNode(s.charAt(i)), s, i + 1, max) : null;
+			return (target == null) ? d.getNode(NULL) : target;
+		}
+
+		public Object findWordSP(String s, int max) {
+			max = Math.min(max, s.length());
+			Dictionary d = findWordSP(this, s, 0, max);
+			return (d == null) ? null : d.getPayload();
+		}
+
+		private Dictionary findWordSP(Dictionary d, String s, int i, int max) {
+			if (d == null) { return null; }
+			while ((i < max) && (s.charAt(i) == ' ')) { ++i; }
+			Dictionary target = (i < max) ? findWordSP(d.getNode(s.charAt(i)), s, i + 1, max) : null;
+			return (target == null) ? d.getNode(NULL) : target;
+		}
+
+		public boolean startsWith(String s, int max) {
+			max = Math.min(max, s.length());
+			return startsWith(this, s, 0, max);
+		}
+
+		private boolean startsWith(Dictionary d, String s, int i, int max) {
+			if (d == null) { return false; }
+			boolean b = (i < max) ? startsWith(d.getNode(s.charAt(i)), s, i + 1, max) : false;
+			return (!b) ? d.contains(NULL) : b;
+		}
+
+		public boolean startsWithSP(String s, int max) {
+			max = Math.min(max, s.length());
+			return startsWithSP(this, s, 0, max);
+		}
+
+		private boolean startsWithSP(Dictionary d, String s, int i, int max) {
+			if (d == null) { return false; }
+			while ((i < max) && (s.charAt(i) == ' ')) { ++i; }
+			boolean b = (i < max) ? startsWithSP(d.getNode(s.charAt(i)), s, i + 1, max) : false;
+			return (!b) ? d.contains(NULL) : b;
+		}
+
+		public String toString() {
+			StringBuilder s = new StringBuilder("");
+			char c = getChar();
+			s.append((c == NULL) ? '\u03D5' : c);
+			s.append(", ").append(list.size()).append(':');
+			for (Dictionary d : list) {
+				c = d.getChar();
+				s.append(' ').append((c == NULL) ? '\u03D5' : c);
+			}
+			return s.toString();
+		}
+	} // end Dictionary class
 }

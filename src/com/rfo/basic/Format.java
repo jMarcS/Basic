@@ -30,6 +30,8 @@
 
 package com.rfo.basic;
 
+import com.rfo.basic.Basic.Dictionary;
+
 import java.util.ArrayList;
 import java.util.Stack;
 
@@ -88,6 +90,8 @@ public class Format extends ListActivity {
         private int indentLevel = 0;
         private Stack<Integer> swStack = new Stack<Integer>();
 
+		Dictionary dBegin, dMid, dEnd;
+
 		@Override
 		protected String doInBackground(String...str) {
 			blockQuote = false;
@@ -99,6 +103,25 @@ public class Format extends ListActivity {
 		protected void onPreExecute() {
 			originalText = Editor.DisplayText.split("\n");	// The original text from the editor
 			formattedText = "";								// The resulting formatted text
+
+			dBegin = new Dictionary();
+			dBegin.addWord("fn.def", dBegin);
+			dBegin.addWord("do", dBegin);
+			dBegin.addWord("while", dBegin);
+			dBegin.addWord("for", dBegin);
+
+			dMid = new Dictionary();
+			dMid.addWord("else", dMid);
+			dMid.addWord("elseif", dMid);
+
+			dEnd = new Dictionary();
+			dEnd.addWord("end", dEnd);
+			dEnd.addWord("endif", dEnd);
+			dEnd.addWord("until", dEnd);
+			dEnd.addWord("repeat", dEnd);
+			dEnd.addWord("fn.end", dEnd);
+			dEnd.addWord("next", dEnd);
+
 		}
 
         @Override
@@ -150,21 +173,13 @@ public class Format extends ListActivity {
         			if (c != '\t') theLine = theLine + c;
         	}
 
-        	if (theLine.startsWith("endif") ||						// Indenting is determined by start of line key words
-        		theLine.startsWith("until") ||						// This group ends a block, reducing indent by 1
-        		theLine.startsWith("repeat") ||
-        		theLine.startsWith("fn.end") ||
-        		theLine.startsWith("next") 
-        		) {
+			// Indenting is determined by start of line key words
+			if (dEnd.startsWithSP(theLine, dEnd.getMaxLength())) {		// This group ends a block, reducing indent by 1
 				indentLevel -= 1;					// Decrement indent level
 				temp = DoIndent();					// Do the indent for this line
         	}
 			else
-        	if (theLine.startsWith("fn.def") ||						// This group starts a block, increasing subsequent indent by 1
-				theLine.startsWith("do") ||
-				theLine.startsWith("while") ||
-				theLine.startsWith("for")
-				) {
+			if (dBegin.startsWithSP(theLine, dBegin.getMaxLength())) {	// This group starts a block, increasing subsequent indent by 1
 				temp = DoIndent();
 				indentLevel += 1;
 			}
